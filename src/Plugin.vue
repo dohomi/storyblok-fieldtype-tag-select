@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="uk-form-row" :style="{'min-height': openSelect ? '400px' : 'auto'}">
-            <multiselect multiple
+            <multiselect :multiple="multiple"
                          v-model="model.values"
                          class="uk-width-1-1"
                          :options="optionValues"
@@ -29,7 +29,8 @@
         search: '',
         selected: 0,
         openSelect: false,
-        optionValues: []
+        optionValues: [],
+        multiple: true
       }
     },
     methods: {
@@ -47,6 +48,9 @@
       },
       pluginCreated () {
         console.log('plugin:created')
+        if(this.options && this.options.single){
+          this.multiple = false
+        }
         this.api.get('cdn/tags', {version: 'draft'})
           .then((res) => {
             this.optionValues = res.data.tags && res.data.tags.map(i => i.name)
@@ -69,6 +73,10 @@
 
     .multiselect__input {
         border: none !important;
+    }
+
+    .uk-form-row .multiselect__tags{
+        border-radius: 0;
     }
 
     .text-block {
