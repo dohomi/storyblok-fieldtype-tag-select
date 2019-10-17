@@ -5,7 +5,7 @@
                          v-model="model.values"
                          class="uk-width-1-1"
                          :options="optionValues"
-                         placeholder="Select class names"
+                         placeholder="Select Tags"
                          :hide-selected="true"
                          :clear-on-select="false"
                          @open="onMultiOpen"
