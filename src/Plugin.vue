@@ -12,7 +12,7 @@
                    @close="onMultiClose">
       </multiselect>
       <div v-if="missingOptions.length">
-        !! Renamed or missing tags: {{missingLabels}}
+        !! Renamed or missing tags: {{ missingLabels }}
       </div>
     </div>
   </div>
@@ -50,6 +50,20 @@ export default {
         plugin: 'tags-select'
       }
     },
+    checkMissingOptions () {
+      let currentModelData = this.model.values
+      if (currentModelData) {
+        if (Array.isArray(currentModelData)) {
+          if (currentModelData.length) {
+            this.missingOptions = currentModelData.filter(data => !this.optionValues.includes(data))
+          }
+        } else {
+          if (!this.optionValues.includes(currentModelData)) {
+            this.missingOptions = [currentModelData]
+          }
+        }
+      }
+    },
     pluginCreated () {
       console.log('plugin:created')
       if (this.options && this.options.single) {
@@ -58,31 +72,19 @@ export default {
       this.api.get('cdn/tags', {version: 'draft'})
           .then((res) => {
             this.optionValues = res.data.tags && res.data.tags.map(i => i.name)
-            let currentModelData = this.model.values
-            if (currentModelData) {
-              if (Array.isArray(currentModelData)) {
-                if (currentModelData.length) {
-                  console.log('cdn/tags loaded', currentModelData)
-                  this.missingOptions = currentModelData.filter(data => !this.optionValues.includes(data))
-                }
-              } else {
-                if (!this.optionValues.includes(currentModelData)) {
-                  this.missingOptions = [currentModelData]
-                }
-              }
-            }
-
+            this.checkMissingOptions()
           })
     }
   },
-  computed:{
-    missingLabels(){
+  computed: {
+    missingLabels () {
       return this.missingOptions.join(', ')
     }
   },
   watch: {
     'model': {
       handler: function (value) {
+        this.checkMissingOptions()
         this.$emit('changed-model', value)
       },
       deep: true
